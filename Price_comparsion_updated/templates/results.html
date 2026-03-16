@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Price Comparison for "{{ query }}"</h1>
+    <h2>Amazon Results</h2>
+    <ul>
+        {% for item in amazon['data']['products'] %}
+        <li>
+            <img src="{{ item['thumbnail'] }}" alt="{{ item['title'] }}" width="100">
+            <a href="{{ item['url'] }}">{{ item['title'] }}</a> - ${{ item['price'] }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Walmart Results</h2>
+    <ul>
+        {% for item in walmart['items'] %}
+        <li>
+            <img src="{{ item['image'] }}" alt="{{ item['title'] }}" width="100">
+            <a href="{{ item['url'] }}">{{ item['title'] }}</a> - ${{ item['price'] }}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

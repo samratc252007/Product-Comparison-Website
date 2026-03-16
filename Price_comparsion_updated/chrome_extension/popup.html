@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Price Comparator</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="http://127.0.0.1:5000" target="_blank" class="logo-link">
+                <img src="https://ui-avatars.com/api/?name=C+S&background=3498db&color=fff&rounded=true&size=32"
+                    alt="Logo" class="logo-img">
+                <h2>CodeSky</h2>
+            </a>
+            <div class="settings-icons">
+                <button id="settingsBtn" class="icon-btn" title="Settings"></button>
+                <button id="themeToggle" class="icon-btn" title="Toggle Dark Mode"></button>
+            </div>
+        </div>
+
+        <div id="settingsMenu" class="settings-menu hidden">
+            <h4>Search directly on stores:</h4>
+            <div class="settings-links">
+                <a href="https://www.amazon.com" target="_blank" class="store-link" id="amazonSettingsLink">Amazon
+                    Search</a>
+                <a href="https://www.walmart.com" target="_blank" class="store-link" id="walmartSettingsLink">Walmart
+                    Search</a>
+            </div>
+        </div>
+
+        <div class="settings-bar">
+            <label class="toggle-switch" title="Show only the absolute lowest price across both platforms">
+                <input type="checkbox" id="cheapestOnlyToggle">
+                <span class="slider round"></span>
+                <span class="toggle-label">Smart Cheapest Only</span>
+            </label>
+            <button id="recentSearchesBtn" class="pill-btn" title="View Recent Searches"> Recent</button>
+        </div>
+
+        <div id="recentSearchesContainer" class="recent-searches-box hidden">
+            <h4>Recent Searches</h4>
+            <ul id="recentSearchesList"></ul>
+            <button id="clearHistoryBtn" class="clear-btn">Clear History</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search for a product..." />
+            <button id="searchBtn">Compare</button>
+        </div>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>Fetching best prices...</p>
+        </div>
+
+        <div id="errorBox" class="error hidden"></div>
+
+        <div id="resultsArea" class="results-container hidden">
+            <!-- Results injected here -->
+        </div>
+
+        <div id="saveOptions" class="save-options hidden">
+            <button id="savePdfBtn" class="export-btn"> Save PDF</button>
+            <button id="saveExcelBtn" class="export-btn"> Save Excel</button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

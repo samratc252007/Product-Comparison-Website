@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codesky - Sign Up</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="auth-body">
+    <!-- Deep Space Parallax Starfield Layers -->
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+
+    <div class="auth-wrapper">
+        <a href="/" class="auth-logo">
+            <i class="fas fa-cloud"></i>
+            Code<span class="accent">sky</span>
+        </a>
+
+        <div class="auth-card">
+            <h2 class="auth-title">Join Codesky</h2>
+            <p class="auth-subtitle">Create a free account to unlock premium tools and data.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="auth-alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('signup') }}" class="auth-form" id="signupForm">
+                <div class="input-group">
+                    <div class="input-wrapper" style="position: relative;">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="username" name="username" class="auth-input" required placeholder=" "
+                            pattern="^[a-zA-Z0-9]+$"
+                            title="Username must contain only letters and numbers, with no special characters or spaces.">
+                        <label for="username" class="floating-label">Username (Letters & Numbers Only)</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-wrapper" style="position: relative;">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" name="email" class="auth-input" required placeholder=" "
+                            title="Please enter a valid email address (e.g., name@example.com).">
+                        <label for="email" class="floating-label">Email Address</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-wrapper" style="position: relative;">
+                        <i class="fas fa-lock input-icon"></i>
+                        <!-- Pattern requires 1 upper, 1 lower, 1 number, 1 special char, min 8 chars -->
+                        <input type="password" id="password" name="password" class="auth-input" required placeholder=" "
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
+                            title="Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, one number, and one special character.">
+                        <label for="password" class="floating-label">Create Password</label>
+                    </div>
+                    <div class="password-requirements">
+                        <ul>
+                            <li id="req-length" class="invalid"><i class="fas fa-times-circle"></i> Min 8 characters
+                            </li>
+                            <li id="req-upper" class="invalid"><i class="fas fa-times-circle"></i> 1 uppercase letter
+                            </li>
+                            <li id="req-lower" class="invalid"><i class="fas fa-times-circle"></i> 1 lowercase letter
+                            </li>
+                            <li id="req-number" class="invalid"><i class="fas fa-times-circle"></i> 1 number</li>
+                            <li id="req-special" class="invalid"><i class="fas fa-times-circle"></i> 1 special character
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary auth-submit" id="submitBtn">
+                    Create Account
+                    <i class="fas fa-user-plus"></i>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ url_for('login') }}" class="auth-link">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Password Validation Script -->
+    <script>
+        const passwordInput = document.getElementById('password');
+        const reqLength = document.getElementById('req-length');
+        const reqUpper = document.getElementById('req-upper');
+        const reqLower = document.getElementById('req-lower');
+        const reqNumber = document.getElementById('req-number');
+        const reqSpecial = document.getElementById('req-special');
+
+        function updateRequirement(element, isValid) {
+            if (isValid) {
+                element.classList.remove('invalid');
+                element.classList.add('valid');
+                element.innerHTML = '<i class="fas fa-check-circle"></i> ' + element.innerText;
+            } else {
+                element.classList.remove('valid');
+                element.classList.add('invalid');
+                element.innerHTML = '<i class="fas fa-times-circle"></i> ' + element.innerText;
+            }
+        }
+
+        passwordInput.addEventListener('input', function () {
+            const val = this.value;
+
+            updateRequirement(reqLength, val.length >= 8);
+            updateRequirement(reqUpper, /[A-Z]/.test(val));
+            updateRequirement(reqLower, /[a-z]/.test(val));
+            updateRequirement(reqNumber, /\d/.test(val));
+            updateRequirement(reqSpecial, /[\W_]/.test(val));
+        });
+    </script>
+</body>
+
+</html>

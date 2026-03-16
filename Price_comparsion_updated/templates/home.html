@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codesky - Smart Price Comparison Platform</title>
+    <meta name="description"
+        content="Codesky is a smart price comparison platform that helps you find the best deals across Amazon and Walmart. Compare prices, ratings, and reviews instantly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="landing-body {% if session.get('username') %}premium-dashboard-body{% endif %}">
+    <!-- Deep Space Parallax Starfield Layers -->
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+
+    <!-- Codesky Text Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <i class="fas fa-cloud splash-logo"></i>
+            <h1 class="splash-text">Code<span class="accent">sky</span></h1>
+            <p class="splash-subtitle">Created and drafted with love in India <i class="fas fa-heart"
+                    style="color: #ef4444;"></i></p>
+        </div>
+    </div>
+
+    <!-- Personalized Welcome Animation -->
+    {% if session.get('show_welcome_animation') %}
+    <div class="welcome-splash" id="welcomeSplash">
+        <div class="welcome-content">
+            <h1 class="welcome-text">Welcome to Codesky, <span class="accent">{{ session.get('username') }}</span>!</h1>
+            <div class="welcome-subtext">Initializing your dashboard...</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <i class="fas fa-cloud"></i>
+                <span>Code<span class="accent">sky</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                {% if not session.get('username') %}
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                {% endif %}
+                <a href="/compare" class="nav-link">Compare</a>
+
+                {% if session.get('username') %}
+                <div class="theme-switcher" style="display: flex; gap: 8px; margin-right: 15px; align-items: center; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 15px;">
+                    <button onclick="setTheme('#00f2fe', '#4facfe')" style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #4facfe); border: 2px solid white; cursor: pointer;"></button>
+                    <button onclick="setTheme('#a855f7', '#8b5cf6')" style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #8b5cf6); border: 2px solid transparent; cursor: pointer;"></button>
+                    <button onclick="setTheme('#10b981', '#059669')" style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); border: 2px solid transparent; cursor: pointer;"></button>
+                </div>
+
+                <div class="notification-center" style="position: relative; margin-right: 15px; cursor: pointer;" onclick="toggleNotifications()">
+                    <i class="fas fa-bell" style="font-size: 1.2rem; color: #fff;"></i>
+                    <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 15px; height: 15px; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+                    <!-- Dropdown -->
+                    <div id="notifDropdown" style="display: none; position: absolute; top: 150%; right: -50px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; width: 280px; padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100;">
+                        <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">Alerts</h4>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.8rem;">
+                            <div style="display: flex; gap: 10px; align-items: start;"><i class="fas fa-arrow-down" style="color: #10b981; margin-top: 3px;"></i> "MacBook Pro" dropped by 12% on Amazon.</div>
+                            <div style="display: flex; gap: 10px; align-items: start;"><i class="fas fa-fire" style="color: #f59e0b; margin-top: 3px;"></i> "Sony WH-1000XM5" is trending right now!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="nav-link nav-username-display"
+                    style="color: var(--primary); font-weight: 700; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">
+                    <i class="fas fa-user-circle"></i> Welcome, {{ session.get('username') }}
+                </span>
+                <a href="{{ url_for('logout') }}" class="nav-btn"
+                    style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: var(--danger);">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link">Sign In</a>
+                <a href="{{ url_for('signup') }}" class="nav-btn">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+                {% endif %}
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero / Dashboard Section -->
+    {% if session.get('username') %}
+    <section class="user-dashboard" id="home" style="min-height: 80vh; padding-top: 120px; padding-bottom: 4rem;">
+        <!-- Trending Marquee Banner -->
+        <div style="width: 100%; background: linear-gradient(90deg, rgba(0,242,254,0.1), rgba(15,23,42,0.6)); border-bottom: 1px solid rgba(0,242,254,0.2); padding: 8px 0; overflow: hidden; white-space: nowrap; position: absolute; top: 80px; left: 0;">
+            <div style="display: inline-block; animation: marquee 30s linear infinite; color: var(--text-muted); font-size: 0.85rem; padding-left: 100%;">
+                🔥 <strong>Trending Now:</strong> Apple AirPods Pro (2nd Gen) <span style="margin: 0 20px;">|</span> ⚡ <strong>Price Drop:</strong> LG C3 OLED TV - Down 15% <span style="margin: 0 20px;">|</span> 🚀 <strong>Hot Search:</strong> Sony PlayStation 5 Console <span style="margin: 0 20px;">|</span> 💡 <strong>Deal of the Day:</strong> Ninja Air Fryer Max XL On Walmart
+            </div>
+            <!-- Duplicate for seamless loop -->
+            <div style="display: inline-block; animation: marquee 30s linear infinite; color: var(--text-muted); font-size: 0.85rem; padding-left: 100%;">
+                🔥 <strong>Trending Now:</strong> Apple AirPods Pro (2nd Gen) <span style="margin: 0 20px;">|</span> ⚡ <strong>Price Drop:</strong> LG C3 OLED TV - Down 15% <span style="margin: 0 20px;">|</span> 🚀 <strong>Hot Search:</strong> Sony PlayStation 5 Console <span style="margin: 0 20px;">|</span> 💡 <strong>Deal of the Day:</strong> Ninja Air Fryer Max XL On Walmart
+            </div>
+        </div>
+        
+        <style>
+            @keyframes marquee {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-100%); }
+            }
+        </style>
+
+        <div class="section-container">
+            <div class="dashboard-header animate-slide-up" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
+                <div>
+                    <h1 class="section-title">Your <span class="gradient-text">Dashboard</span></h1>
+                    <p class="section-subtitle">Welcome back, {{ session.get('username') }}. Here are your recent search
+                        insights.</p>
+                </div>
+                
+                <!-- Gamified Search Streak Progress Ring -->
+                <div style="display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.03); padding: 0.5rem 1rem; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="position: relative; width: 40px; height: 40px;">
+                        <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                            <path stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 3;" />
+                            <path id="streakRing" stroke-dasharray="65, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="fill: none; stroke: var(--primary); stroke-width: 3; transition: stroke-dasharray 1.5s ease; stroke-linecap: round;" />
+                        </svg>
+                        <i class="fas fa-fire" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #f59e0b; font-size: 0.9rem;"></i>
+                    </div>
+                    <div style="font-size: 0.85rem;">
+                        <strong style="color: #fff; display: block;">{{ current_streak }} Day Streak</strong>
+                        <span style="color: var(--text-muted); font-size: 0.75rem;">Premium Member</span>
+                    </div>
+                </div>
+                <!-- Dynamic SVG Script -->
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const streak = parseInt("{{ current_streak }}") || 0;
+                        const maxStreak = 30; // 30 days fills the circle
+                        const percentage = Math.min((streak / maxStreak) * 100, 100);
+                        const dashValue = `${percentage}, 100`;
+                        document.getElementById('streakRing').style.strokeDasharray = dashValue;
+                    });
+                </script>
+            </div>
+
+            <div class="dashboard-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <!-- Main Chart -->
+                <div class="dashboard-card animate-slide-up"
+                    style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <h3 style="margin-bottom: 1rem; color: #fff; font-family: 'Outfit'; font-size: 1.5rem;"><i
+                            class="fas fa-chart-line" style="color: var(--primary);"></i> Your Most Searched Products
+                    </h3>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="mySearchChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Searches & Filtering -->
+                <div class="dashboard-card animate-slide-up"
+                    style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); --delay: 0.2s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <h3 style="color: #fff; font-family: 'Outfit'; font-size: 1.5rem; margin: 0;"><i
+                                class="fas fa-history" style="color: var(--accent);"></i> Recent Searches</h3>
+                        
+                        <!-- Search Filter Input -->
+                        <div style="position: relative; width: 100%; max-width: 200px;">
+                            <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+                            <input type="text" id="historyFilter" placeholder="Filter history..." onkeyup="filterHistory()" style="width: 100%; padding: 0.4rem 1rem 0.4rem 2rem; border-radius: 20px; background: rgba(0,0,0,0.2) !important; border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 0.85rem; outline: none; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <ul id="recentSearchesList"
+                        style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; max-height: 250px; overflow-y: auto;">
+                        <li style="color: var(--text-muted);">Loading recent searches...</li>
+                    </ul>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                        <a href="/compare" class="btn-primary"
+                            style="flex: 1; display: flex; justify-content: center;"><i
+                                class="fas fa-search"></i> New Search</a>
+                        
+                        <!-- CSV Download History Button -->
+                        <button onclick="downloadHistoryCSV()" class="btn-primary" style="background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white; padding: 0 1.5rem;" title="Download History Data"><i class="fas fa-download"></i></button>
+                    </div>
+
+                    <!-- Compare Suggestions Smart Cards -->
+                    <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                        <h4 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px;">💡 Smart Suggestions</h4>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="/compare?query=iPhone%2015%20Pro" style="background: rgba(0,242,254,0.1); border: 1px solid rgba(0,242,254,0.3); color: #fff; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; text-decoration: none; transition: 0.3s; cursor: pointer;">📱 iPhone 15 Pro</a>
+                            <a href="/compare?query=Dyson%20V15" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); color: #fff; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; text-decoration: none; transition: 0.3s; cursor: pointer;">🧹 Dyson V15</a>
+                            <a href="/compare?query=Sony%20A7IV" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #fff; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; text-decoration: none; transition: 0.3s; cursor: pointer;">📸 Sony A7IV</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium Features Column -->
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    
+                    <!-- Premium Watchlist Widget -->
+                    <div class="dashboard-card animate-slide-up" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px); --delay: 0.25s;">
+                        <h3 style="margin-bottom: 1.5rem; color: #fff; font-family: 'Outfit'; font-size: 1.2rem;"><i class="fas fa-heart" style="color: #ef4444;"></i> Premium Watchlist</h3>
+                        <div id="watchlistContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;">
+                            <!-- Populated by JS -->
+                            <div style="color: var(--text-muted); font-size: 0.85rem;">Loading watchlist...</div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Savings Goal Widget -->
+                    <div class="dashboard-card animate-slide-up"
+                        style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px); text-align: center; --delay: 0.3s; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%); animation: rotateMesh 10s linear infinite; pointer-events: none;"></div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
+                            <h3 style="margin-bottom: 0.5rem; color: #fff; font-family: 'Outfit'; font-size: 1.2rem;"><i class="fas fa-bullseye" style="color: #8b5cf6;"></i> Savings Goal</h3>
+                            <button onclick="editSavingsGoal()" style="background: none; border: none; color: #8b5cf6; cursor: pointer; font-size: 0.85rem;"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                        
+                        <div style="font-size: 3rem; font-weight: 800; color: #fff; font-family: 'Inter'; text-shadow: 0 0 20px rgba(139, 92, 246, 0.5); position: relative; z-index: 1; margin: 10px 0;">
+                            $<span id="savingsCounter">0</span> <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/ $<span id="savingsTarget">500</span></span>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; z-index: 1; margin-top: 15px;">
+                            <div id="savingsProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #8b5cf6, #d946ef); border-radius: 10px; transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Price Drop Alerts Toggle -->
+                    <div class="dashboard-card animate-slide-up"
+                        style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 1.5rem 2rem; backdrop-filter: blur(10px); --delay: 0.4s; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h3 style="margin-bottom: 0.25rem; color: #fff; font-family: 'Outfit'; font-size: 1.2rem;"><i class="fas fa-bell" style="color: var(--primary);"></i> Price Drop Alerts</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Notify me when my recent searches drop in price.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="alertToggle" onchange="toggleAlerts(this)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("{{ url_for('api_my_search_stats') }}")
+                .then(response => response.json())
+                .then(data => {
+                    Chart.defaults.color = '#94a3b8';
+                    Chart.defaults.font.family = "'Inter', sans-serif";
+
+                    // Handle Top Queries Chart
+                    if (data.top_queries && data.top_queries.length > 0) {
+                        const ctx = document.getElementById('mySearchChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: data.top_queries.map(q => q.query),
+                                datasets: [{
+                                    label: 'Search Count',
+                                    data: data.top_queries.map(q => q.count),
+                                    backgroundColor: 'rgba(0, 242, 254, 0.6)',
+                                    borderColor: 'rgba(0, 242, 254, 1)',
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    hoverBackgroundColor: 'rgba(0, 242, 254, 0.8)'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                                        ticks: { precision: 0 }
+                                    },
+                                    x: { grid: { display: false } }
+                                },
+                                plugins: { legend: { display: false } }
+                            }
+                        });
+                    } else {
+                        document.getElementById('mySearchChart').parentElement.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">No search history yet. Start comparing to see your stats!</p>';
+                    }
+
+                    // Handle Recent Searches List
+                    const listEl = document.getElementById('recentSearchesList');
+                    if (data.recent && data.recent.length > 0) {
+                        listEl.innerHTML = '';
+                        data.recent.forEach(item => {
+                            const li = document.createElement('li');
+                            li.style.cssText = 'background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 8px; border-left: 3px solid var(--accent); display: flex; justify-content: space-between; align-items: center;';
+
+                            const date = new Date(item.timestamp + 'Z'); // Parse UTC SQLite timestamp
+
+                            li.innerHTML = `
+                                <a href="/compare?query=${encodeURIComponent(item.query)}" style="text-decoration: none; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <span style="font-weight: 500; color: #fff; text-transform: capitalize; transition: color 0.3s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='#fff'">${item.query}</span>
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">${date.toLocaleDateString()} <i class="fas fa-chevron-right" style="margin-left: 5px; font-size: 0.7rem;"></i></span>
+                                </a>
+                            `;
+                            listEl.appendChild(li);
+                        });
+                    } else {
+                        listEl.innerHTML = '<li style="color: var(--text-muted);">No recent searches found.</li>';
+                    }
+                })
+                .catch(err => console.error("Error fetching stats:", err));
+                
+            // Premium Savings Counter Animation
+            setTimeout(() => {
+                const counter = document.getElementById('savingsCounter');
+                if (counter) {
+                    const target = Math.floor(Math.random() * (450 - 120 + 1)) + 120; // Random savings between $120 and $450
+                    let current = 0;
+                    const increment = target / 60; // 60 frames
+                    const timer = setInterval(() => {
+                        current += increment;
+                        counter.innerText = Math.floor(current);
+                        if (current >= target) {
+                            counter.innerText = target;
+                            clearInterval(timer);
+                        }
+                    }, 30);
+                    
+                    // Render Savings Goal Progress Bar
+                    const targetGoal = parseInt(document.getElementById('savingsTarget').innerText.replace(/,/g, '')) || 500;
+                    const percent = Math.min((target / targetGoal) * 100, 100);
+                    setTimeout(() => {
+                        document.getElementById('savingsProgressBar').style.width = `${percent}%`;
+                    }, 1500); // Trigger after number animation finishes mostly
+                }
+            }, 500);
+
+            // Render Premium Watchlist from LocalStorage
+            const watchlistContainer = document.getElementById('watchlistContainer');
+            if (watchlistContainer) {
+                const watchlist = JSON.parse(localStorage.getItem('premiumWatchlist') || '[]');
+                if (watchlist.length === 0) {
+                    watchlistContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-top: 2rem;">No items in your watchlist yet.</p>';
+                } else {
+                    watchlistContainer.innerHTML = ''; // Clear loading
+                    watchlist.forEach(item => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 8px; border-left: 3px solid #ef4444; display: flex; justify-content: space-between; align-items: center;';
+                        row.innerHTML = `
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; color: #fff; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">${item.title.replace(/"/g, '')}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${item.date}</div>
+                            </div>
+                            <div style="font-weight: 700; color: #10b981;">
+                                ${item.price && item.price !== '99999' ? '$' + item.price : 'N/A'}
+                            </div>
+                            <button onclick="removeFromDashboardWatchlist('${item.title}')" style="background: none; border: none; color: #ef4444; cursor: pointer; margin-left: 15px; font-size: 0.9rem;"><i class="fas fa-trash"></i></button>
+                        `;
+                        watchlistContainer.appendChild(row);
+                    });
+                }
+            }
+        });
+
+        function removeFromDashboardWatchlist(title) {
+            let watchlist = JSON.parse(localStorage.getItem('premiumWatchlist') || '[]');
+            watchlist = watchlist.filter(item => item.title !== title);
+            localStorage.setItem('premiumWatchlist', JSON.stringify(watchlist));
+            showToast("Item removed from Watchlist", "trash");
+            // Reload page to re-render easily
+            setTimeout(() => window.location.reload(), 800);
+        }
+
+        function editSavingsGoal() {
+            const currentGoalObj = document.getElementById('savingsTarget');
+            const newGoal = prompt("Enter your new Savings Goal ($):", currentGoalObj.innerText);
+            if(newGoal && !isNaN(newGoal)) {
+                currentGoalObj.innerText = newGoal;
+                showToast("Savings Goal Updated!", "bullseye");
+                
+                // Recalculate progress bar
+                const currentSavings = parseInt(document.getElementById('savingsCounter').innerText.replace(/,/g, '')) || 0;
+                const percent = Math.min((currentSavings / parseInt(newGoal)) * 100, 100);
+                document.getElementById('savingsProgressBar').style.width = `${percent}%`;
+            }
+        }
+
+        // Premium Toast Notification Function
+        function showToast(message, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                background: rgba(10, 14, 23, 0.9);
+                backdrop-filter: blur(10px);
+                border-left: 4px solid ${type === 'success' ? '#00f2fe' : '#8b5cf6'};
+                color: #fff;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                font-family: 'Inter', sans-serif;
+                font-size: 0.95rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                transform: translateX(120%);
+                transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            `;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-bell'}" style="color: ${type === 'success' ? '#00f2fe' : '#8b5cf6'};"></i> ${message}`;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => { toast.style.transform = 'translateX(0)'; }, 10);
+            
+            // Remove after 3s
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => { toast.remove(); }, 400);
+            }, 3000);
+        }
+
+        // Toggle Alerts Logic
+        function toggleAlerts(checkbox) {
+            if (checkbox.checked) {
+                showToast("Email price drop alerts activated!", "bell");
+            } else {
+                showToast("Price alerts disabled.", "success");
+            }
+        }
+
+        // =============================
+        // Premium Features JavaScript
+        // =============================
+
+        // 1. Theme Setting
+        function setTheme(primaryHex, secondaryHex) {
+            document.documentElement.style.setProperty('--primary', primaryHex);
+            document.documentElement.style.setProperty('--secondary', secondaryHex);
+            
+            // Re-render chart dataset color
+            if(window.mySearchChartInstance) {
+                window.mySearchChartInstance.data.datasets[0].backgroundColor = primaryHex + '99'; // 60% opacity
+                window.mySearchChartInstance.data.datasets[0].borderColor = primaryHex;
+                window.mySearchChartInstance.update();
+            }
+            showToast("Theme Updated!", "palette");
+        }
+
+        // 2. Notification Dropdown Toggle
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notifDropdown');
+            if (dropdown.style.display === 'none') {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const center = document.querySelector('.notification-center');
+            if(center && !center.contains(e.target)) {
+                document.getElementById('notifDropdown').style.display = 'none';
+            }
+        });
+
+        // 3. Search History Filter
+        function filterHistory() {
+            const input = document.getElementById('historyFilter').value.toLowerCase();
+            const list = document.getElementById('recentSearchesList');
+            const items = list.getElementsByTagName('li');
+            
+            for (let i = 0; i < items.length; i++) {
+                const aTag = items[i].getElementsByTagName('a')[0];
+                if(aTag) {
+                    const txtValue = aTag.textContent || aTag.innerText;
+                    if (txtValue.toLowerCase().indexOf(input) > -1) {
+                        items[i].style.display = "";
+                    } else {
+                        items[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // 4. Download History as CSV
+        function downloadHistoryCSV() {
+            const list = document.getElementById('recentSearchesList');
+            const items = list.getElementsByTagName('li');
+            
+            if(items.length === 0 || items[0].innerText.includes('Loading')) {
+                showToast("No history to download", "info-circle");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Search Query\n";
+            for (let i = 0; i < items.length; i++) {
+                const aTag = items[i].getElementsByTagName('a')[0];
+                if(aTag) {
+                    let text = aTag.innerText.trim();
+                    text = text.replace('→', '').trim();
+                    csvContent += `"${text}"\n`;
+                }
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "my_codesky_searches.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Search History Downloaded", "download");
+        }
+
+        // 5. FAB Menu Toggle
+        function toggleFabMenu() {
+            const menu = document.getElementById('fabMenu');
+            const icon = document.getElementById('fabIcon');
+            
+            if (menu.style.visibility === 'hidden') {
+                menu.style.visibility = 'visible';
+                menu.style.opacity = '1';
+                menu.style.transform = 'translateY(0) scale(1)';
+                icon.style.transform = 'rotate(45deg)';
+            } else {
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(20px) scale(0.9)';
+                icon.style.transform = 'rotate(0deg)';
+                setTimeout(() => { menu.style.visibility = 'hidden'; }, 300);
+            }
+        }
+    </script>
+    {% else %}
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-badge animate-fade-in">
+                <i class="fas fa-bolt"></i> Smart Shopping Starts Here
+            </div>
+            <h1 class="hero-title">
+                <span id="heroTypewriter"></span><span class="type-cursor">|</span>
+            </h1>
+            <p class="hero-subtitle animate-slide-up delay-1">
+                Your intelligent price comparison platform. Find the best deals across
+                <span class="highlight-amazon">Amazon</span> and
+                <span class="highlight-walmart">Walmart</span> in seconds.
+            </p>
+            <p class="hero-description animate-slide-up delay-2">
+                We aggregate real-time pricing data, customer ratings, reviews, and availability
+                from multiple retailers so you never overpay again. Save time, save money — shop smarter.
+            </p>
+            <div class="hero-cta animate-slide-up delay-3">
+                <a href="/compare" class="btn-primary">
+                    <i class="fas fa-arrow-right"></i> Start Comparing
+                </a>
+                <a href="#features" class="btn-secondary">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            </div>
+            <div class="hero-stats animate-fade-in delay-4">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="2">2</span>
+                    <span class="stat-label">Retailers</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="1000000">1M+</span>
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">Real-Time</span>
+                    <span class="stat-label">Price Updates</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual animate-float">
+            <div class="floating-card card-1">
+                <i class="fab fa-amazon"></i>
+                <span>$299.99</span>
+            </div>
+            <div class="floating-card card-2">
+                <i class="fas fa-tag"></i>
+                <span>Best Deal!</span>
+            </div>
+            <div class="floating-card card-3">
+                <i class="fas fa-star"></i>
+                <span>4.8 ★</span>
+            </div>
+        </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-badge">Why Codesky?</span>
+                <h2 class="section-title">Powerful Comparison Features</h2>
+                <p class="section-subtitle">Everything you need to make informed purchasing decisions</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll" style="--delay: 0.1s">
+                    <div class="feature-icon icon-blue">
+                        <i class="fas fa-search-dollar"></i>
+                    </div>
+                    <h3>Real-Time Price Tracking</h3>
+                    <p>Get live prices from Amazon and Walmart APIs. No cached or outdated data — every search pulls
+                        fresh results.</p>
+                </div>
+                <div class="feature-card animate-on-scroll" style="--delay: 0.2s">
+                    <div class="feature-icon icon-purple">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>Side-by-Side Comparison</h3>
+                    <p>Compare products from different retailers side by side. See price differences, ratings, and
+                        availability at a glance.</p>
+                </div>
+                <div class="feature-card animate-on-scroll" style="--delay: 0.3s">
+                    <div class="feature-icon icon-green">
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <h3>Rating & Reviews Analysis</h3>
+                    <p>See star ratings and review counts from each platform to find products with the best reputation.
+                    </p>
+                </div>
+                <div class="feature-card animate-on-scroll" style="--delay: 0.4s">
+                    <div class="feature-icon icon-orange">
+                        <i class="fas fa-sort-amount-down"></i>
+                    </div>
+                    <h3>Smart Sorting & Filtering</h3>
+                    <p>Sort results by price (low to high or high to low), rating, or number of reviews. Filter by price
+                        range.</p>
+                </div>
+                <div class="feature-card animate-on-scroll" style="--delay: 0.5s">
+                    <div class="feature-icon icon-red">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <h3>Savings Calculator</h3>
+                    <p>Instantly see how much you can save by choosing the cheaper option. Percentage savings shown
+                        automatically.</p>
+                </div>
+                <div class="feature-card animate-on-scroll" style="--delay: 0.6s">
+                    <div class="feature-icon icon-teal">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Responsive Design</h3>
+                    <p>Works beautifully on desktop, tablet, and mobile. Compare prices on the go, wherever you are.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-badge">Simple Process</span>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Three simple steps to find the best deals</p>
+            </div>
+            <div class="steps-container">
+                <div class="step animate-on-scroll" style="--delay: 0.1s">
+                    <div class="step-number">01</div>
+                    <div class="step-content">
+                        <h3>Search for a Product</h3>
+                        <p>Enter any product name — from laptops to headphones to kitchen gadgets. Our search handles
+                            everything.</p>
+                    </div>
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <div class="step-connector animate-on-scroll"></div>
+                <div class="step animate-on-scroll" style="--delay: 0.3s">
+                    <div class="step-number">02</div>
+                    <div class="step-content">
+                        <h3>Compare Results</h3>
+                        <p>View prices, ratings, and availability from Amazon and Walmart side by side. Sort and filter
+                            to find what matters most.</p>
+                    </div>
+                    <div class="step-icon">
+                        <i class="fas fa-columns"></i>
+                    </div>
+                </div>
+                <div class="step-connector animate-on-scroll"></div>
+                <div class="step animate-on-scroll" style="--delay: 0.5s">
+                    <div class="step-number">03</div>
+                    <div class="step-content">
+                        <h3>Buy at the Best Price</h3>
+                        <p>Click through to the retailer with the best deal and complete your purchase. It's that
+                            simple.</p>
+                    </div>
+                    <div class="step-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team" id="team">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-badge">Meet the Team</span>
+                <h2 class="section-title">Team <span class="gradient-text">Codesky</span></h2>
+                <p class="section-subtitle">The minds behind this smart price comparison platform</p>
+            </div>
+            <div class="team-grid">
+                <div class="team-card animate-on-scroll" style="--delay: 0.1s">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder">SC</div>
+                    </div>
+                    <h3 class="team-name">Samrat Choudhury</h3>
+                    <p class="team-role">Full Stack Developer</p>
+                    <p class="team-desc">Backend architecture & API integration specialist</p>
+                    <div class="team-social">
+                        <a href="https://github.com/samratc252007"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/samrat25/"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="team-card animate-on-scroll" style="--delay: 0.2s">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder">SS</div>
+                    </div>
+                    <h3 class="team-name">Sanjana SD</h3>
+                    <p class="team-role">UI/UX Designer</p>
+                    <p class="team-desc">Frontend design & user experience architect</p>
+                    <div class="team-social">
+                        <a href="https://github.com/sanjanasd111-lang"><i class="fab fa-github"></i></a>
+                        <a
+                            href="https://www.linkedin.com/in/sanjana-s-d-038078386?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"><i
+                                class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="team-card animate-on-scroll" style="--delay: 0.3s">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder">SS</div>
+                    </div>
+                    <h3 class="team-name">Sanjay S</h3>
+                    <p class="team-role">Data Engineer</p>
+                    <p class="team-desc">Data processing & comparison algorithms</p>
+                    <div class="team-social">
+                        <a href="https://github.com/SanjaySrinivas4599"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/sanjaysachi2007/"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="section-container">
+            <div class="cta-content animate-on-scroll">
+                <h2>Ready to Save Money?</h2>
+                <p>Start comparing prices from Amazon and Walmart in seconds. No signup required.</p>
+                <a href="/compare" class="btn-primary btn-large">
+                    <i class="fas fa-rocket"></i> Launch Price Comparison
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="section-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="nav-logo">
+                        <i class="fas fa-cloud"></i>
+                        <span>Code<span class="accent">sky</span></span>
+                    </a>
+                    <p>Smart price comparison platform by Team Codesky. Find the best deals across retailers instantly.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="#home">Home</a>
+                    <a href="#features">Features</a>
+                    <a href="#team">Team</a>
+                    <a href="/compare">Compare</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Technology</h4>
+                    <a href="#">Python Flask</a>
+                    <a href="#">RapidAPI</a>
+                    <a href="#">HTML/CSS/JS</a>
+                    <a href="#">Jinja2</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Team Codesky. All rights reserved. Built for educational purposes.</p>
+                <p>Created and drafted with love in India <i class="fas fa-heart" style="color: #ef4444;"></i></p>
+                <p>Samrat Choudhury &middot; Sanjana SD &middot; Sanjay S</p>
+                {% if not session.get('username') %}
+                <p style="margin-top: 1rem;"><a href="{{ url_for('admin_login') }}"
+                        style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; opacity: 0.7; transition: opacity 0.3s ease;"><i
+                            class="fas fa-user-shield"></i> Admin Portal</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // =============================
+        // Typewriter Effect
+        // =============================
+        function typeWriter() {
+            const textToType = 'Welcome to Codesky';
+            const element = document.getElementById('heroTypewriter');
+            let index = 0;
+            let isDeleting = false;
+
+            function type() {
+                // Determine current string based on index
+                if (index >= 11) {
+                    // Include the gradient span if past "Welcome to "
+                    element.innerHTML = 'Welcome to <span class="gradient-text">' + textToType.substring(11, index) + '</span>';
+                } else {
+                    element.innerHTML = textToType.substring(0, index);
+                }
+
+                if (!isDeleting && index < textToType.length) {
+                    index++;
+                    setTimeout(type, Math.random() * 100 + 50);
+                } else if (!isDeleting && index === textToType.length) {
+                    isDeleting = true;
+                    setTimeout(type, 2500); // Pause before erasing
+                } else if (isDeleting && index > 0) {
+                    index--;
+                    setTimeout(type, Math.random() * 50 + 20); // Erase faster than typing
+                } else if (isDeleting && index === 0) {
+                    isDeleting = false;
+                    setTimeout(type, 800); // Pause before typing again
+                }
+            }
+
+            // Start typing
+            type();
+        }
+
+        // =============================
+        // Splash Screen Loader
+        // =============================
+        window.addEventListener('load', () => {
+            const welcomeSplash = document.getElementById('welcomeSplash');
+
+            // Welcome Splash Dismissal Logic
+            if (welcomeSplash) {
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    welcomeSplash.style.opacity = '0';
+                    welcomeSplash.style.visibility = 'hidden';
+                    document.body.style.overflow = '';
+                    // Tell backend we saw the animation so it doesn't run again on refresh
+                    fetch("{{ url_for('clear_welcome_flag') }}");
+                }, 3500); // 3.5s dramatic welcome
+            }
+
+            // Standard Splash Screen Logic (Only if welcome isn't there)
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen && !welcomeSplash) {
+                document.body.style.overflow = 'hidden';
+                // Audio playback removed per user request
+
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    setTimeout(() => {
+                        splashScreen.style.display = 'none';
+                        typeWriter();
+                    }, 800);
+                }, 2500);
+            } else if (welcomeSplash) {
+                // if welcome is there hide standard splash instantly
+                if (splashScreen) splashScreen.style.display = 'none';
+                setTimeout(() => {
+                    typeWriter();
+                }, 3500);
+            } else {
+                typeWriter();
+            }
+        });
+
+        // =============================
+        // Navbar Scroll Effect
+        // =============================
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // =============================
+        // Mobile Nav Toggle
+        // =============================
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // =============================
+        // Scroll Animation Observer
+        // =============================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // =============================
+        // Smooth Scrolling
+        // =============================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    document.querySelector('.nav-links').classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

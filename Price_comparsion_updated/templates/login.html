@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codesky - Sign In</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="auth-body">
+    <!-- Deep Space Parallax Starfield Layers -->
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+
+    <div class="auth-wrapper">
+        <a href="/" class="auth-logo">
+            <i class="fas fa-cloud"></i>
+            Code<span class="accent">sky</span>
+        </a>
+
+        <div class="auth-card">
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to your account and continue exploring the cosmos.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="auth-alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}" class="auth-form" id="loginForm">
+                <div class="input-group">
+                    <div class="input-wrapper" style="position: relative;">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" name="email" class="auth-input" required placeholder=" " title="Please enter a valid email address.">
+                        <label for="email" class="floating-label">Email Address</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-wrapper" style="position: relative;">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" name="password" class="auth-input" required placeholder=" " title="Enter your password">
+                        <label for="password" class="floating-label">Password</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary auth-submit" id="submitBtn">
+                    Sign In
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>New to Codesky? <a href="{{ url_for('signup') }}" class="auth-link">Create an account</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    // Clear premium dashboard data upon successful logout
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('logged_out')) {
+        localStorage.removeItem('premiumWatchlist');
+        // Let's also clear the savings Goal if they log out
+        localStorage.removeItem('savingsGoal');
+    }
+</script>
+</html>

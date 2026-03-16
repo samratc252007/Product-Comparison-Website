@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codesky - Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .admin-dashboard-wrapper {
+            max-width: 1200px;
+            margin: 4rem auto;
+            position: relative;
+            z-index: 10;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 20, 40, 0.6);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .admin-title-area h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-title-area p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(10, 20, 40, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(14, 165, 233, 0.4);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-icon.blue {
+            background: rgba(14, 165, 233, 0.1);
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+
+        .stat-icon.green {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-icon.purple {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-content h3 {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-content .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-light);
+        }
+
+        .admin-table-container {
+            background: rgba(10, 20, 40, 0.6);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .admin-table-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-table-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            table-layout: fixed;
+        }
+
+        .admin-table th {
+            background: rgba(14, 165, 233, 0.05);
+            color: var(--primary-light);
+            font-weight: 600;
+            padding: 1.2rem 2rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+        }
+
+        .admin-table td {
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-table tr:hover td {
+            background: rgba(14, 165, 233, 0.08);
+            color: #fff;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .id-badge {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .password-hidden {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            min-width: 120px;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .action-flex {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-action {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .btn-action i {
+            font-size: 1rem;
+        }
+
+        .btn-action.delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-action.suspend-24:hover {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-action.suspend-life:hover {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-action.unsuspend:hover {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+            transform: scale(1.1);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-sus-24 {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-sus-life {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .row-suspended {
+            opacity: 0.6;
+            background: rgba(239, 68, 68, 0.02) !important;
+        }
+    </style>
+</head>
+
+<body class="admin-light-mode">
+    <!-- Animated Flow Background -->
+    <div class="flow-bg"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+
+    <!-- Admin Welcome Animation (AI Bot) -->
+    {% if session.get('show_admin_welcome') %}
+    <div class="ai-bot-container" id="adminWelcomeSplash">
+        <div class="ai-chat-box">
+            <div class="ai-bot-avatar">
+                <i class="fas fa-robot"></i>
+                <div class="pulse-ring"></div>
+            </div>
+            <div class="ai-bot-message-area">
+                <div class="ai-bot-header">System AI Assistant</div>
+                <div class="ai-bot-text-container">
+                    <span class="ai-bot-text" id="aiBotText"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="admin-dashboard-wrapper" id="dashboardContent"
+        style="opacity: {% if session.get('show_admin_welcome') %}0{% else %}1{% endif %}; transition: opacity 1s ease 4.5s;">
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="admin-title-area">
+                <h1><i class="fas fa-satellite-dish" style="color: var(--primary); margin-right: 0.5rem;"></i> Command
+                    Center</h1>
+                <p>Advanced system metrics and user management.</p>
+            </div>
+            <a href="{{ url_for('admin_logout') }}" class="btn-danger">
+                <i class="fas fa-power-off"></i> Terminate Session
+            </a>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="admin-stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                <div class="stat-content">
+                    <h3>Total Users</h3>
+                    <div class="stat-value">{{ users|length }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-server"></i></div>
+                <div class="stat-content">
+                    <h3>System Status</h3>
+                    <div class="stat-value" style="color: #10b981; font-size: 1.5rem;">Online & Secure</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-database"></i></div>
+                <div class="stat-content">
+                    <h3>Database Health</h3>
+                    <div class="stat-value" style="color: #a78bfa; font-size: 1.5rem;">Optimal</div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- User Table -->
+        <div class="admin-table-container">
+            <div class="admin-table-header">
+                <h2><i class="fas fa-id-card-clip"></i> Registered Accounts Repository</h2>
+                <div style="color: var(--primary); font-size: 0.9rem; font-weight: 600;">ACTIVE</div>
+            </div>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">System ID</th>
+                        <th style="width: 25%;">User Identity</th>
+                        <th style="width: 25%;">Connected Email</th>
+                        <th style="width: 20%;">Security Credentials</th>
+                        <th style="width: 15%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="{% if user['status'] != 'active' %}row-suspended{% endif %}">
+                        <td><span class="id-badge">ID-{{ "%04d" | format(user['id']) }}</span></td>
+                        <td style="display: flex; align-items: center;">
+                            <div class="user-avatar">{{ user['username'][0]|upper }}</div>
+                            <span style="font-weight: 500;">
+                                {{ user['username'] }}
+                                {% if user['status'] == 'suspended_24h' %}
+                                <span class="status-badge status-sus-24">24H Block</span>
+                                {% elif user['status'] == 'suspended_lifetime' %}
+                                <span class="status-badge status-sus-life">Banned</span>
+                                {% else %}
+                                <span class="status-badge status-active">Active</span>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td><i class="fas fa-paper-plane"
+                                style="color: var(--primary-light); opacity: 0.5; margin-right: 0.5rem;"></i> {{
+                            user['email'] }}</td>
+                        <div class="password-hidden" title="Passwords are encrypted and hidden for security">
+                            ********
+                        </div>
+                        </td>
+                        <td>
+                            <div class="action-flex">
+                                <form action="{{ url_for('admin_action', user_id=user['id'], action='delete') }}"
+                                    method="POST" style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to permanently delete user ID-{{ user.id }}? This cannot be undone.');">
+                                    <button type="submit" class="btn-action delete" title="Permanently Delete User"><i
+                                            class="fas fa-trash-alt"></i></button>
+                                </form>
+
+                                {% if user['status'] == 'active' %}
+                                <form action="{{ url_for('admin_action', user_id=user['id'], action='suspend_24h') }}"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-action suspend-24" title="Suspend for 24 Hours"><i
+                                            class="fas fa-clock"></i></button>
+                                </form>
+                                <form
+                                    action="{{ url_for('admin_action', user_id=user['id'], action='suspend_lifetime') }}"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-action suspend-life" title="Lifetime Suspension"><i
+                                            class="fas fa-ban"></i></button>
+                                </form>
+                                {% else %}
+                                <form action="{{ url_for('admin_action', user_id=user['id'], action='unsuspend') }}"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-action unsuspend" title="Revoke Suspension"><i
+                                            class="fas fa-unlock"></i></button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                            <i class="fas fa-ghost"
+                                style="font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.3;"></i>
+                            <span style="font-size: 1.2rem;">The repository is currently empty.</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Admin Welcome Splash Logic
+        const welcomeSplash = document.getElementById('adminWelcomeSplash');
+        const dashboardContent = document.getElementById('dashboardContent');
+
+        if (welcomeSplash) {
+            document.body.style.overflow = 'hidden';
+
+            // AI Bot Typing Animation Logic
+            const botTextElement = document.getElementById('aiBotText');
+            if (botTextElement) {
+                const textToType = 'Hi Admin... Initializing Dashboard';
+                let i = 0;
+
+                function typeBotText() {
+                    if (i < textToType.length) {
+                        botTextElement.innerHTML += textToType.charAt(i);
+                        i++;
+                        setTimeout(typeBotText, 80); // Typing speed
+                    } else {
+                        // Keep text blinking cursor for a moment before fading out
+                        botTextElement.style.animation = 'blinkWelcome 0.75s step-end infinite';
+                    }
+                }
+
+                // Start typing shortly after avatar appears
+                setTimeout(typeBotText, 500);
+            }
+
+            // Total splash duration before fade out
+            setTimeout(() => {
+                welcomeSplash.style.opacity = '0';
+                welcomeSplash.style.visibility = 'hidden';
+                welcomeSplash.style.transition = 'opacity 0.8s ease, visibility 0.8s ease';
+                document.body.style.overflow = '';
+
+                if (dashboardContent) {
+                    dashboardContent.style.opacity = '1';
+                }
+
+                // Tell backend we saw the animation so it doesn't run again on refresh
+                fetch("{{ url_for('clear_admin_welcome_flag') }}");
+            }, 4500); // 4.5s total welcome time to allow reading
+        }
+    </script>
+
+
+</body>
+
+</html>

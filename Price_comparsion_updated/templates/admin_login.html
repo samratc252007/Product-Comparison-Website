@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codesky - Admin Auth</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="auth-body admin-light-mode">
+    <!-- Animated Flow Background -->
+    <div class="flow-bg"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+
+    <div class="auth-wrapper">
+        <a href="/" class="auth-logo">
+            <i class="fas fa-cloud"></i>
+            Code<span class="accent">sky</span>
+        </a>
+        
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-shield-alt" style="font-size: 2.5rem; color: #f59e0b; margin-bottom: 1rem; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));"></i>
+                <h2 class="auth-title">Admin Access</h2>
+                <p class="auth-subtitle">Restricted system administration login</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="auth-alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('admin_login') }}">
+                <div class="input-group">
+                    <i class="fas fa-user-shield input-icon"></i>
+                    <input type="text" id="username" name="username" class="auth-input" required placeholder=" ">
+                    <label for="username" class="floating-label">Admin Username</label>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="password" name="password" class="auth-input" required placeholder=" ">
+                    <label for="password" class="floating-label">Admin Password</label>
+                </div>
+                
+                <button type="submit" class="btn-primary auth-submit" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                    Authenticate System <i class="fas fa-fingerprint"></i>
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p><a href="/" class="auth-link"><i class="fas fa-arrow-left"></i> Return to Main Site</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

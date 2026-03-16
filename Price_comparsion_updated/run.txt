@@ -1,0 +1,47 @@
+step 1    :   pip install -r requirements.txt
+
+step 2    :   python app.py    or flask run
+
+step 3    :   Test Walmart API (optional) - python test_walmart.py
+
+
+API ENDPOINTS:
+
+
+
+
+WALMART (Updated - Working):
+https://rapidapi.com/jobykjoseph10/api/realtime-walmart-data/playground/apiendpoint_6e384c8e-aae1-4e7c-aa48-a4e21d07f85a
+
+
+https://realtime-walmart-data.p.rapidapi.com/search
+API Host: realtime-walmart-data.p.rapidapi.com
+Endpoint: /search
+Method: GET
+Query Parameters: keyword, page, sort
+Status: ✅ WORKING
+Documentation: https://rapidapi.com/lkrjchl/api/realtime-walmart-data
+
+
+
+
+
+
+
+AMAZON:
+https://rapidapi.com/letscrape-6bRBa3QguO5/api/real-time-amazon-data/playground/endpoint_369599f7-6147-4cb9-9417-09dcd429936d
+
+
+API KEY INFORMATION:
+- Walmart API Key: 439c2eeeebmshb8a3324b65fc1adp1ed1adjsnea3faa1113e3
+- Walmart API Host: realtime-walmart-data.p.rapidapi.com
+- Keys are stored in app.py fetch_walmart_data() and fetch_amazon_data() functions
+
+
+UPDATED FEATURES (2024):
+- Walmart API migrated from walmart2.p.rapidapi.com to realtime-walmart-data.p.rapidapi.com
+- Uses requests library instead of http.client
+- Fetches Walmart products with sorting by price (high to low)
+- Displays product title, price, rating, reviews, image, and availability
+- Normalizes response data for frontend display
+- Error handling for request failures and JSON parsing
